@@ -133,9 +133,7 @@ run fedora and enter:
 
 `make sim`   to build db48x
 
-`cd sim`
-
-`./db48x`   to build db48x
+`./sim/db48x` to run db48x with the correct help-file
 
 db48x should run now :-)
 

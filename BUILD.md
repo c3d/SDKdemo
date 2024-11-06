@@ -160,7 +160,7 @@ run fedora and enter:
 * windows explorer opens 
 * copy the shurtcut `Windows PowerShell (x86)`  and rename it to `Windows PowerShell - db48x` 
 * right hit on the file and `properties`:
-* change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl -- ~/db48x/sim/db48x`
+* change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./sim/db48x`
 
 ###  db48x without powershell 
 
@@ -169,4 +169,4 @@ run fedora and enter:
 * windows explorer opens 
 * copy the shurtcut `Windows PowerShell (x86)`  and rename it to `db48x` 
 * right hit on the file and `properties`:
-* change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl -- ~/db48x/sim/db48x`
+* change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl --cd "~/db48x" -- ./sim/db48x`

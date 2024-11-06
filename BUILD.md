@@ -149,6 +149,12 @@ run fedora and enter:
 
 `git pull`
 
+## RESET db48X
+
+run fedora and enter:
+
+`git reset --hard HEAD~1`
+
 ## Add Shortcut to Windows (Start-Menu):
 
 ###  db48x - WSL terminal

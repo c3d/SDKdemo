@@ -151,17 +151,30 @@ run fedora and enter:
 
 ## Add Shortcut to Windows (Start-Menu):
 
-###  powershell and db48x
-
+###  db48x - WSL terminal
+to operate in the terminal
 * hit the windows key on your keyboard and enter powershell
 * move the cursor over teh powershell-icon and hit the right button and select `open file location`
 * windows explorer opens 
-* copy the shurtcut `Windows PowerShell (x86)`  and rename it to `Windows PowerShell - db48x` 
+* copy the shurtcut `Windows PowerShell (x86)`  and rename it to `db48x - WSL terminal` 
+* right hit on the file and `properties`:
+* change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x"`
+
+
+
+###  db48x + WSL
++ you will see the problems in the terminal window
+- two windows
+* hit the windows key on your keyboard and enter powershell
+* move the cursor over teh powershell-icon and hit the right button and select `open file location`
+* windows explorer opens 
+* copy the shurtcut `Windows PowerShell (x86)`  and rename it to `db48x + WSL` 
 * right hit on the file and `properties`:
 * change the target of the shurtcut to `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./sim/db48x`
 
-###  db48x without powershell 
-
+###  db48x (without terminal)
+- you will not see the problems in the terminal window, because it is hidden
++ one window
 * hit the windows key on your keyboard and enter powershell
 * move the cursor over teh powershell-icon and hit the right button and select `open file location`
 * windows explorer opens 

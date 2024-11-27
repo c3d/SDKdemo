@@ -959,7 +959,7 @@ struct object
 protected:
     static const dispatch   handler[NUM_IDS];
 
-#if DEBUG
+#if DEBUG || SIMULATOR
 public:
     cstring debug() const;
 #endif

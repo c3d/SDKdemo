@@ -1708,7 +1708,7 @@ int object::type_value(id ty)
 }
 
 
-#if DEBUG
+#if DEBUG || SIMULATOR
 cstring object::debug() const
 // ----------------------------------------------------------------------------
 //   Render an object from the debugger

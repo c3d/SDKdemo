@@ -66,9 +66,13 @@ qt_add_executable(${TARGET}
     sim-window.h
     sim-screen.h
     sim-rpl.h
+    android/AndroidManifest.xml
 )
 
-target_include_directories(${TARGET} PRIVATE ../src/${VARIANT} ../src/dmcp ../src $(SDK))
+set_property(TARGET ${TARGET} APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+             ${CMAKE_CURRENT_SOURCE_DIR}/android)
+
+target_include_directories(${TARGET} PRIVATE ../src/${VARIANT} ../src/dmcp ../src ${SDK} ./)
 
 target_link_libraries(${TARGET} PRIVATE recorder)
 
@@ -119,3 +123,17 @@ qt_add_resources(${TARGET} "help" PREFIX "/help" BASE ${PROJECT_SOURCE_DIR}/help
 qt_add_resources(${TARGET} "config" PREFIX "/config" BASE ${PROJECT_SOURCE_DIR}/config FILES ${CONFIG_FILES})
 
 target_sources(${TARGET} PRIVATE ${UI_HEADERS} ${RESOURCE_FILES})
+
+install(TARGETS ${TARGET}
+    BUNDLE  DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+qt_generate_deploy_app_script(
+    TARGET ${TARGET}
+    OUTPUT_SCRIPT deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR
+)
+
+install(SCRIPT ${deploy_script})

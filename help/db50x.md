@@ -7497,13 +7497,13 @@ The variables in the Modern Physics section are:
 
 In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
-![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
+![Planck & Wien Comparison](img/Planck_and_Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
 In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
-![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
+![Planck & Rayleigh-Jeans Comparison](img/Planck_and_Rayleigh-Jeans_Distributions.bmp)
 
 #### Photoelectric Effect
 
@@ -8811,75 +8811,6 @@ Recall a property of a variable
 
 ## PACKDIR
 Pack a directory in an editable object
-# Errors and error handlers
-
-## EXITRPL
-Panic exit - abort the RPL engine.
-
-
-## EVAL1NEXT
-Perform EVAL1 on the next object in a secondary and skips it
-
-
-## RESUME
-End error handler and resume execution of main program
-
-
-## DOERR
-Issue an error condition
-
-
-## ERRN
-Recall the previous error code
-
-
-## ERRM
-Recall the previous error message
-
-
-## ERR0
-Clear previous error code
-
-
-## HALT
-Halt the execution of RPL code
-
-
-## CONT
-Continue execution of a halted program
-
-
-## SST
-Single-step through a halted program, skip over subroutines
-
-
-## SSTIN
-Single-step through a halted program, goes into subroutines
-
-
-## KILL
-Terminate a halted program
-
-
-## SETBKPOINT
-Set a breakpoint on a halted program
-
-
-## CLRBKPOINT
-Remove a breakpoint
-
-
-## DBUG
-Halt the given program at the first instruction for debugging
-
-
-## BLAMEERR
-Issue an error condition, blame other program for it
-
-
-## EXIT
-Early exit from the current program or loop
-
 # Flow control
 
 ## If
@@ -8998,6 +8929,75 @@ Loop FORUP ... NEXT/STEP statement
 
 ## FORDN
 Loop FORUP ... NEXT/STEP statement
+# Errors and error handlers
+
+## EXITRPL
+Panic exit - abort the RPL engine.
+
+
+## EVAL1NEXT
+Perform EVAL1 on the next object in a secondary and skips it
+
+
+## RESUME
+End error handler and resume execution of main program
+
+
+## DOERR
+Issue an error condition
+
+
+## ERRN
+Recall the previous error code
+
+
+## ERRM
+Recall the previous error message
+
+
+## ERR0
+Clear previous error code
+
+
+## HALT
+Halt the execution of RPL code
+
+
+## CONT
+Continue execution of a halted program
+
+
+## SST
+Single-step through a halted program, skip over subroutines
+
+
+## SSTIN
+Single-step through a halted program, goes into subroutines
+
+
+## KILL
+Terminate a halted program
+
+
+## SETBKPOINT
+Set a breakpoint on a halted program
+
+
+## CLRBKPOINT
+Remove a breakpoint
+
+
+## DBUG
+Halt the given program at the first instruction for debugging
+
+
+## BLAMEERR
+Issue an error condition, blame other program for it
+
+
+## EXIT
+Early exit from the current program or loop
+
 # Flags
 
 Flags are truth value that can be controled and tested by the user.

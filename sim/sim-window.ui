@@ -41,24 +41,12 @@
      <widget class="QStackedWidget" name="stackedWidget">
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
+        <item alignment="Qt::AlignHCenter">
          <widget class="SimScreen" name="screen">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>120</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>1056</width>
-            <height>728</height>
+            <width>400</width>
+            <height>240</height>
            </size>
           </property>
           <property name="focusPolicy">
@@ -85,8 +73,8 @@
          <widget class="QPushButton" name="keyboard">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
+            <horstretch>1</horstretch>
+            <verstretch>3</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">

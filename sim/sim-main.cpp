@@ -36,8 +36,12 @@
 #include "sysmenu.h"
 #include "version.h"
 
+#include <unistd.h>
+
 #include <QApplication>
 #include <QWindow>
+#include <QStandardPaths>
+#include <QDirIterator>
 
 RECORDER(options, 32, "Information about command line options");
 RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
@@ -92,6 +96,30 @@ size_t recorder_render_object(intptr_t tracing,
 // Ensure linker keeps debug code
 extern cstring debug();
 
+void copyAndReplaceFolderContents(const QString &fromDir, const QString &toDir) {
+    QDirIterator it(fromDir, QDirIterator::Subdirectories);
+    QDir from(fromDir);
+    QDir to(toDir);
+
+    while (it.hasNext()){
+        it.next();
+        const auto fileInfo = it.fileInfo();
+        if(!fileInfo.isHidden()) { //filters dot and dotdot
+            const QString constructedAbsolutePath = to.filePath(from.relativeFilePath(fileInfo.absoluteFilePath()));
+            
+            if(fileInfo.isDir()){
+                //Create directory in target folder
+                to.mkpath(constructedAbsolutePath);
+            } else if(fileInfo.isFile()) {
+                //Copy File to target directory
+
+                //Remove file at target location, if it exists, or QFile::copy will fail
+                QFile::remove(constructedAbsolutePath);
+                QFile::copy(fileInfo.absoluteFilePath(), constructedAbsolutePath);
+            }
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 // ----------------------------------------------------------------------------
@@ -265,9 +293,20 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif // QT version 6
 
+
     QCoreApplication::setOrganizationName("DB48X Project");
     QCoreApplication::setOrganizationDomain("48calc.org");
     QCoreApplication::setApplicationName("DB48X");
+
+    QString file_location = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir t_dir(file_location);
+    if (!t_dir.exists()) {
+        t_dir.mkpath(file_location);
+    }
+
+    copyAndReplaceFolderContents(":/", file_location);
+
+    QDir::setCurrent(file_location);
 
     QApplication a(argc, argv);
     MainWindow w;

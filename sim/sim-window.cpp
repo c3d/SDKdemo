@@ -841,8 +841,6 @@ void MainWindow::initializeAudio(const QAudioDevice &deviceInfo, uint freq)
     QAudioFormat format = deviceInfo.preferredFormat();
     const int    durationUs = 1000000 /* microseconds */;
 
-    if (audio)
-        audio->stop();
     audio.reset(new QAudioSink(deviceInfo, format));
     generator.reset(new AudioGenerator(format, durationUs, freq));
     generator->start();

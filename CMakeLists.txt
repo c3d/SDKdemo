@@ -21,4 +21,19 @@ qt_standard_project_setup()
 
 # Add the sim subdirectory
 add_subdirectory(recorder)
+
+# Run the shell command and capture its output
+execute_process(
+    COMMAND "git describe --dirty=Z --abbrev=4"
+    OUTPUT_VARIABLE GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Process the output to match the sed and cut commands
+string(REGEX REPLACE "^v" "" GIT_VERSION "${GIT_VERSION}")
+string(REGEX REPLACE "-g" "-" GIT_VERSION "${GIT_VERSION}")
+string(SUBSTRING "${GIT_VERSION}" 0 16 DB48X_VERSION)
+
+add_compile_definitions(DB48X_VERSION=\"${DB48X_VERSION}\")
+
 add_subdirectory(sim)

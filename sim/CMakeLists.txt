@@ -1,5 +1,5 @@
 # Define the executable
-qt_add_executable(${TARGET}
+set(SOURCES
     sim-main.cpp
     sim-window.cpp
     sim-screen.cpp
@@ -69,6 +69,10 @@ qt_add_executable(${TARGET}
     android/AndroidManifest.xml
 )
 
+qt6_add_executable(${TARGET} ${SOURCES})
+
+qt6_add_ui(${TARGET} SOURCES sim-window.ui)
+
 set_property(TARGET ${TARGET} APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
              ${CMAKE_CURRENT_SOURCE_DIR}/android)
 
@@ -113,7 +117,6 @@ endif()
 target_link_libraries(${TARGET} PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::QuickControls2 Qt6::QuickWidgets Qt6::Widgets Qt6::Multimedia)
 
 # Add UI forms and resources
-qt6_wrap_ui(UI_HEADERS sim-window.ui)
 qt6_add_resources(RESOURCE_FILES sim.qrc)
 
 file(GLOB_RECURSE HELP_FILES ${PROJECT_SOURCE_DIR}/help/*)
@@ -122,7 +125,7 @@ file(GLOB_RECURSE CONFIG_FILES ${PROJECT_SOURCE_DIR}/config/*)
 qt_add_resources(${TARGET} "help" PREFIX "/help" BASE ${PROJECT_SOURCE_DIR}/help FILES ${HELP_FILES})
 qt_add_resources(${TARGET} "config" PREFIX "/config" BASE ${PROJECT_SOURCE_DIR}/config FILES ${CONFIG_FILES})
 
-target_sources(${TARGET} PRIVATE ${UI_HEADERS} ${RESOURCE_FILES})
+target_sources(${TARGET} PRIVATE ${RESOURCE_FILES})
 
 install(TARGETS ${TARGET}
     BUNDLE  DESTINATION .

@@ -53,7 +53,6 @@
 #include "user_interface.h"
 #include "utf8.h"
 #include "util.h"
-#include "version.h"
 
 #include <ctype.h>
 #include <stdio.h>

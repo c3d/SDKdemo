@@ -144,21 +144,11 @@ void MainWindow::resizeEvent(QResizeEvent * event)
         h = LCD_H+5;
     if(!w)
         w = LCD_W;
-    qreal dpwidth = event->size().width();
+    qreal dpwidth = event->size().width() - 24;
     qreal realwidth = dpwidth * dpratio;
     qreal scale = realwidth / w;
-    if((int)scale < 1)
-        scale = 1.0;
-    else
-        scale = (int)scale;
-    if (event->size().height() * 0.38 * dpratio < scale * h)
-    {
-        scale = event->size().height() * 0.38 * dpratio / h;
-        if ((int) scale < 1)
-            scale = 1.0;
-        else
-            scale = (int) scale;
-    }
+    scale = qMin(scale, event->size().height() * 0.38 * dpratio / h);
+    scale = qMax(scale, 1.0);
     ui.screen->setScale(scale / dpratio);
 }
 

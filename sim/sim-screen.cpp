@@ -100,7 +100,7 @@ SimScreen::SimScreen(QWidget *parent)
     s.setHeight(int(LCD_H / ratio));
     setMinimumSize(s);
     sizePolicy().setHorizontalPolicy(QSizePolicy::MinimumExpanding);
-    sizePolicy().setVerticalPolicy(QSizePolicy::MinimumExpanding);
+    sizePolicy().setVerticalPolicy(QSizePolicy::Minimum);
     sizePolicy().setHorizontalStretch(1);
     sizePolicy().setVerticalStretch(1);
 
@@ -184,8 +184,9 @@ void SimScreen::updatePixmap()
     auto width = size().width();
     auto height = size().height();
     auto ratio = qApp->primaryScreen()->devicePixelRatio();
-    auto newPixmap = mainPixmap.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    auto newPixmap = mainPixmap.scaled(size() * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     scaledPixmap.swap(newPixmap);
+    scaledPixmap.setDevicePixelRatio(ratio);
 }
 
 
@@ -201,7 +202,7 @@ void SimScreen::refreshScreen()
     setScene(&screen);
     auto width = scaledPixmap.width();
     auto height = scaledPixmap.height();
-    setSceneRect(0, 0, scaledPixmap.width(), scaledPixmap.height());
+    setSceneRect(screen.itemsBoundingRect());
     QGraphicsView::update();
     redraws++;
 }

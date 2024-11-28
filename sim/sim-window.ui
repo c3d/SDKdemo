@@ -43,12 +43,6 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item alignment="Qt::AlignHCenter">
          <widget class="SimScreen" name="screen">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>240</height>
-           </size>
-          </property>
           <property name="focusPolicy">
            <enum>Qt::NoFocus</enum>
           </property>
@@ -72,7 +66,7 @@
         <item>
          <widget class="QPushButton" name="keyboard">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>1</horstretch>
             <verstretch>3</verstretch>
            </sizepolicy>

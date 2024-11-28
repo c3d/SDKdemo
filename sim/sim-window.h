@@ -178,6 +178,7 @@ signals:
 private:
     // Audio support
     void        initializeAudio(const QAudioDevice &deviceInfo, uint freq);
+    void        adjustSize(const QSize &size);
 
 private slots:
     void        updateAudioDevices();

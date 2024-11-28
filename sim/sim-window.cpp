@@ -107,7 +107,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     qreal dpratio = qApp->primaryScreen()->devicePixelRatio();
     dpratio *= devicePixelRatio;
+
+#ifdef __ANDROID__
+    adjustSize(QApplication::primaryScreen()->availableSize());
+#else
     resize(210 * dpratio, 370 * dpratio);
+#endif
 
     // Audio setup
     connect(devices, &QMediaDevices::audioOutputsChanged,
@@ -137,19 +142,14 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 //   Resizing the window
 // ----------------------------------------------------------------------------
 {
-    qreal dpratio = qApp->primaryScreen()->devicePixelRatio();
-    int w = ui.screen->screen_width;
-    int h = ui.screen->screen_height + 5;
-    if(!h)
-        h = LCD_H+5;
-    if(!w)
-        w = LCD_W;
-    qreal dpwidth = event->size().width() - 24;
-    qreal realwidth = dpwidth * dpratio;
-    qreal scale = realwidth / w;
-    scale = qMin(scale, event->size().height() * 0.38 * dpratio / h);
-    scale = qMax(scale, 1.0);
-    ui.screen->setScale(scale / dpratio);
+#ifndef __ANDROID__
+    adjustSize(event->size());
+#endif
+}
+
+void MainWindow::adjustSize(const QSize &size)
+{
+    ui.screen->adjustSize(size);
 }
 
 

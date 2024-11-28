@@ -54,6 +54,7 @@ public:
     QGraphicsScene       screen;
     QGraphicsPixmapItem *mainScreen;
     QPixmap              mainPixmap;
+    QPixmap              scaledPixmap;
 
     uint                 redraws;
 
@@ -64,7 +65,7 @@ public:
     ~SimScreen();
 
   public:
-    void        setScale(qreal _scale);
+    void        adjustSize(const QSize &size);
     void        updatePixmap();
     void        refreshScreen();
     static void update_pixmap() { theScreen->updatePixmap(); }

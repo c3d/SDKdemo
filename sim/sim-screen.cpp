@@ -32,7 +32,7 @@
 #include "dmcp.h"
 #include "sim-dmcp.h"
 #include <target.h>
-
+#include <QtGui>
 
 #if WASM
 
@@ -80,20 +80,28 @@ SimScreen::SimScreen(QWidget *parent)
       bgPen(bgColor),
       fgPen(fgColor),
       mainPixmap(SIM_LCD_W, SIM_LCD_H),
+      scaledPixmap(SIM_LCD_W, SIM_LCD_H),
       redraws(0)
 {
     screen.clear();
     screen.setBackgroundBrush(QBrush(Qt::black));
 
     mainPixmap.fill(bgColor);
-    mainScreen = screen.addPixmap(mainPixmap);
+    scaledPixmap.fill(bgColor);
+    auto ratio = qApp->primaryScreen()->devicePixelRatio();
+    scaledPixmap.setDevicePixelRatio(ratio);
+    mainScreen = screen.addPixmap(scaledPixmap);
     mainScreen->setOffset(0.0, 0.0);
 
     setScene(&screen);
-    setSceneRect(0, -5, screen_width, screen_height + 5);
-    scale = 1.0;
-    sizePolicy().setHorizontalPolicy(QSizePolicy::Minimum);
+    setSceneRect(0, 0, screen_width, screen_height);
+    QSize s;
+    s.setWidth(int(LCD_W / ratio));
+    s.setHeight(int(LCD_H / ratio));
+    setMinimumSize(s);
+    sizePolicy().setHorizontalPolicy(QSizePolicy::MinimumExpanding);
     sizePolicy().setVerticalPolicy(QSizePolicy::MinimumExpanding);
+    sizePolicy().setHorizontalStretch(1);
     sizePolicy().setVerticalStretch(1);
 
     for (size_t i = 0; i < sizeof(lcd_copy) / sizeof(*lcd_copy); i++)
@@ -113,20 +121,20 @@ SimScreen::~SimScreen()
 }
 
 
-void SimScreen::setScale(qreal sf)
+void SimScreen::adjustSize(const QSize & size)
 // ----------------------------------------------------------------------------
 //   Adjust the scaling factor
 // ----------------------------------------------------------------------------
 {
-    QGraphicsView::scale(sf / scale, sf / scale);
-    this->scale = sf;
-
     QSize s;
-    s.setWidth(LCD_W);
-    s.setHeight((screen_height + 5) * scale);
+    s.setWidth(size.width() - 24);
+    s.setHeight(size.width() * LCD_H / LCD_W);
     setMinimumSize(s);
-    sizeHint().setHeight((screen_height + 5) * scale);
+    sizeHint().setWidth(size.width() - 24);
+    sizeHint().setHeight((int)qMin(int(size.height() * 0.38), size.width() / LCD_W * LCD_H));
     updateGeometry();
+    updatePixmap();
+    refreshScreen();
 }
 
 
@@ -138,6 +146,7 @@ void SimScreen::updatePixmap()
 {
     // Monochrome screen
     QPainter pt(&mainPixmap);
+    // pt.setRenderHint(QPainter::SmoothPixmapTransform, true);
     pixword mask = ~(~0U << color::BPP);
     surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
     for (int y = 0; y < SIM_LCD_H; y++)
@@ -172,6 +181,11 @@ void SimScreen::updatePixmap()
         }
     }
     pt.end();
+    auto width = size().width();
+    auto height = size().height();
+    auto ratio = qApp->primaryScreen()->devicePixelRatio();
+    auto newPixmap = mainPixmap.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    scaledPixmap.swap(newPixmap);
 }
 
 
@@ -181,7 +195,13 @@ void SimScreen::refreshScreen()
 // ----------------------------------------------------------------------------
 //   This must be done on the main screen
 {
-    mainScreen->setPixmap(mainPixmap);
+    screen.clear();
+    mainScreen = screen.addPixmap(scaledPixmap);
+    mainScreen->setOffset(0.0, 0.0);
+    setScene(&screen);
+    auto width = scaledPixmap.width();
+    auto height = scaledPixmap.height();
+    setSceneRect(0, 0, scaledPixmap.width(), scaledPixmap.height());
     QGraphicsView::update();
     redraws++;
 }

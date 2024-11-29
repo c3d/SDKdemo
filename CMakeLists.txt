@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(db48x LANGUAGES C CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 QuickWidgets Widgets Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 QuickWidgets Widgets Multimedia OpenGLWidgets)
 
 # Set the target and platform
 # TODO: control other flags depending on target

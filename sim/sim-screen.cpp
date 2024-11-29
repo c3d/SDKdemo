@@ -56,6 +56,7 @@ uintptr_t ui_lcd_buffer()
 #include <QBitmap>
 #include <QGraphicsPixmapItem>
 #include <QTimer>
+#include <QOpenGLWidget>
 
 SimScreen *SimScreen::theScreen = nullptr;
 
@@ -80,21 +81,21 @@ SimScreen::SimScreen(QWidget *parent)
       bgPen(bgColor),
       fgPen(fgColor),
       mainPixmap(SIM_LCD_W, SIM_LCD_H),
-      scaledPixmap(SIM_LCD_W, SIM_LCD_H),
       redraws(0)
 {
+    setViewport(new QOpenGLWidget());
     screen.clear();
     screen.setBackgroundBrush(QBrush(Qt::black));
 
     mainPixmap.fill(bgColor);
-    scaledPixmap.fill(bgColor);
     auto ratio = qApp->primaryScreen()->devicePixelRatio();
+    scaledPixmap = mainPixmap.scaled(size() * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     scaledPixmap.setDevicePixelRatio(ratio);
     mainScreen = screen.addPixmap(scaledPixmap);
     mainScreen->setOffset(0.0, 0.0);
 
     setScene(&screen);
-    setSceneRect(0, 0, screen_width, screen_height);
+    setSceneRect(screen.itemsBoundingRect());
     QSize s;
     s.setWidth(int(LCD_W / ratio));
     s.setHeight(int(LCD_H / ratio));
@@ -134,6 +135,8 @@ void SimScreen::adjustSize(const QSize & size)
     sizeHint().setHeight((int)qMin(int(size.height() * 0.38), size.width() / LCD_W * LCD_H));
     updateGeometry();
     updatePixmap();
+    mainScreen->setPixmap(scaledPixmap);
+    setSceneRect(screen.itemsBoundingRect());
     refreshScreen();
 }
 
@@ -185,8 +188,8 @@ void SimScreen::updatePixmap()
     auto height = size().height();
     auto ratio = qApp->primaryScreen()->devicePixelRatio();
     auto newPixmap = mainPixmap.scaled(size() * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    newPixmap.setDevicePixelRatio(ratio);
     scaledPixmap.swap(newPixmap);
-    scaledPixmap.setDevicePixelRatio(ratio);
 }
 
 
@@ -196,13 +199,7 @@ void SimScreen::refreshScreen()
 // ----------------------------------------------------------------------------
 //   This must be done on the main screen
 {
-    screen.clear();
-    mainScreen = screen.addPixmap(scaledPixmap);
-    mainScreen->setOffset(0.0, 0.0);
-    setScene(&screen);
-    auto width = scaledPixmap.width();
-    auto height = scaledPixmap.height();
-    setSceneRect(screen.itemsBoundingRect());
+    mainScreen->setPixmap(scaledPixmap);
     QGraphicsView::update();
     redraws++;
 }

@@ -114,7 +114,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(${TARGET} PRIVATE -Wno-unknown-pragmas)
 endif()
 
-target_link_libraries(${TARGET} PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::QuickControls2 Qt6::QuickWidgets Qt6::Widgets Qt6::Multimedia)
+target_link_libraries(${TARGET} PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::QuickControls2 Qt6::QuickWidgets Qt6::Widgets Qt6::Multimedia Qt6::OpenGLWidgets)
 
 # Add UI forms and resources
 qt6_add_resources(RESOURCE_FILES sim.qrc)

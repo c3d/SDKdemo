@@ -181,7 +181,8 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            user_input_commands();
+            regression_checks();
+//            user_input_commands();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -10747,6 +10748,33 @@ void tests::regression_checks()
         .test(CLEAR, ID_ConstantsMenu, F4, F3, F4,
               ID_mul, ID_sqrt, ID_inv, ID_ToDecimal)
         .expect("299 792 458. m/(F↑(¹/₂)·H↑(¹/₂))");
+
+    step("Bug XXX1: Input empty default value should output emtpy string")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" \"\" INPUT",ENTER)
+        .test(ENTER)
+        .test(ENTER)
+        .expect("\"\"");
+
+    step("Bug XXX2: Polynomial input parsing does not skip first term (passing test)")
+        .test(CLEAR, EXIT,
+              "'1+2X'",ENTER)
+        .expect("'1+2·X'");
+
+    step("Bug XXX3: Polynomial input parsing skips first term (failing test)")
+        .test(CLEAR, EXIT,
+              "'1+2X+X'",ENTER)
+        .expect("'1+2·X+X'");
+
+    step("Bug XXX4: Polynomial input parsing works with · (passing test)")
+        .test(CLEAR, EXIT,
+              "'1+2·X+X'",ENTER)
+        .expect("'1+2·X+X'");
+
+    // crashes db48
+    step("Bug XXX5: PICTx2 followed by DISP")
+        .test(CLEAR, EXIT, 
+              "PICT PICT DISP", ENTER);
 
     step("Checking parsing of unary -")
         .test(CLEAR, "'-X'", ENTER).expect("'-X'")

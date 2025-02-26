@@ -97,6 +97,17 @@ static algebraic_p recall(algebraic_r namer)
     return nullptr;
 }
 
+static algebraic_p difference_for_solve(algebraic_r eq)
+// ----------------------------------------------------------------------------
+//   Transform equations into proper differences
+// ----------------------------------------------------------------------------
+{
+    if (expression_p eqeq = expression::get(eq))
+        if (expression_g diff = eqeq->as_difference_for_solve())
+            return diff;
+    return eq;
+}
+
 algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 // ----------------------------------------------------------------------------
 //   The core of the solver, numerical solving for a single variable
@@ -679,7 +690,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     list_g eqns   = eqs;
 
     // While there are variables to solve for
-    while (vcount && ecount)
+    while (vcount && ecount && !program::interrupted())
     {
         list::iterator vi    = vars->begin();
         list::iterator gi    = gvalues->begin();
@@ -702,11 +713,13 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 rt.type_error();
                 return nullptr;
             }
+
+            // The variable must be well-defined in exactly one equation
             list::iterator ei = eqns->begin();
-            expression_g   best;
-            uint           bestvars = ~0U;
-            size_t         bestidx  = 0;
-            for (size_t e = 0; !found && e < ecount && bestvars; e++)
+            expression_g   def;
+            size_t         defidx = 0;
+            uint           defs   = 0;
+            for (size_t e = 0; !found && e < ecount && defs < 2; e++)
             {
                 expression_g eq = expression::get(*ei);
                 if (!eq)
@@ -717,29 +730,18 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 }
                 if (eq->is_well_defined(var, false))
                 {
-                    list::iterator ovi    = vars->begin();
-                    uint           wdvars = 0;
-                    for (size_t ov = 0; ov < vcount; ov++)
+                    if (!defs++)
                     {
-                        if (ov != v)
-                            if (symbol_g ovar = (*ovi)->as_quoted<symbol>())
-                                if (eq->is_well_defined(ovar, false, var))
-                                    wdvars++;
-                        ++ovi;
-                    }
-                    if (wdvars < bestvars)
-                    {
-                        best     = eq;
-                        bestvars = wdvars;
-                        bestidx  = e;
+                        def = eq;
+                        defidx = e;
                     }
                 }
                 ++ei;
             }
 
-            if (best)
+            if (defs >= 1 && defs <= 1 + ecount - vcount)
             {
-                program_g   pgm    = +best;
+                program_g   pgm    = +def;
                 algebraic_p guess  = algebraic_p(*gi);
                 algebraic_g solved = solve(pgm, name, guess);
                 if (!solved)
@@ -753,7 +755,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 // That's one variable less to deal with
                 vars    = vars->remove(v);
                 gvalues = gvalues->remove(v);
-                eqns    = eqns->remove(bestidx);
+                eqns    = eqns->remove(defidx);
                 vcount--;
                 ecount--;
                 found = true;
@@ -763,6 +765,13 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
         }
 
         // This algorithm does not apply, some variables were not found
+        if (!found && ecount >= vcount)
+        {
+            eqns = eqns->map(difference_for_solve);
+            found = jacobi_solver(eqns, vars, gvalues);
+            ecount = 0;
+            vcount = 0;
+        }
         if (!found)
         {
             rt.multisolver_variable_error();
@@ -773,6 +782,124 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
 
     list_g result = names->map(recall);
     return result;
+}
+
+
+bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
+// ----------------------------------------------------------------------------
+//  Compute a Jacobian when there is cross-talk between variables
+// ----------------------------------------------------------------------------
+{
+    size_t n = vars->items();
+    ASSERT("We need more equations than variables" && n <= eqs->items());
+    ASSERT("Variable count must match guess count" && n == guesses->items());
+
+    // Memorise depth
+    size_t depth = rt.depth();
+
+    // Compute the desired precision
+    int            impr  = Settings.SolverImprecision();
+    algebraic_g    eps   = algebraic::epsilon(impr);
+    algebraic_g    oeps  = decimal::make(101,-2);
+    uint           max   = Settings.SolverIterations();
+    uint           iter  = 0;
+
+    while (iter++ < max)
+    {
+        // Set all variables to current value of guesses
+        list::iterator gi = guesses->begin();
+        for (object_p varo : *vars)
+        {
+            object_p valo = *gi;
+            if (!directory::store_here(varo, valo))
+                goto error;
+            ++gi;
+        }
+
+        // Evaluate all equations at current values of variables
+        algebraic_g magnitude;
+        size_t neqs = 0;
+        for (object_p eqo : *eqs)
+        {
+            expression_p eq = expression::get(eqo);
+            if (!eq)
+                goto error;
+            algebraic_p value = eq->evaluate();
+            if (!value || !(neqs >= n || rt.push(value)))
+                goto error;
+            algebraic_g absval = abs::run(value);
+            magnitude = magnitude ? magnitude + absval : absval;
+            neqs++;
+        }
+
+        // Check if we already found a solution, if so exit
+        if (smaller_magnitude(magnitude, eps))
+            break;
+
+        // Compute the Jacobi matrix by shifting each variable
+        gi = guesses->begin();
+        size_t column = 0;
+        for (object_g varo : *vars)
+        {
+            // Put (1+eps)*value into the variable
+            object_p valo = *gi;
+            algebraic_g val = valo->as_algebraic();
+            if (!val)
+                goto error;
+            algebraic_g dx = val;
+            val = val * oeps;
+            if (val->is_same_as(*gi))
+                val = val + oeps;
+            dx = dx - val;
+            if (!directory::store_here(varo, +val))
+                goto error;
+
+            // Evaluate each expression and subtract current value
+            neqs = 0;
+            for (object_p eqo : *eqs)
+            {
+                if (neqs >= n)
+                    break;
+                expression_p eq = expression::get(eqo);
+                if (!eq)
+                    goto error;
+                algebraic_g now = eq->evaluate();
+                algebraic_g dydx = rt.stack(column + n - 1)->as_algebraic();
+                dydx = (dydx - now) / dx;
+                if (!dydx || !rt.push(+dydx))
+                    goto error;
+                neqs++;
+            }
+
+            // We added a column
+            column += n;
+
+            // Restore original value
+            valo = *gi;
+            if (!directory::store_here(varo, valo))
+                goto error;
+            ++gi;
+        }
+
+        // It's a bit inefficient to create arrays here, but save code space
+        array_g j = array::from_stack(n, n, true);
+        array_g v = array::from_stack(n, 0);
+        array_g d = v / j;
+        v = array_p(+guesses);
+        v = v - d;
+        if (!v)
+            goto error;
+
+        // This is the new guesses
+        guesses = +v;
+    } // while (iter < max)
+
+    rt.drop(rt.depth() - depth);
+    return iter < max;
+
+error:
+    rt.drop(rt.depth() - depth);
+    return false;
 }
 
 

@@ -182,8 +182,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            matrix_functions();
-
+        {
+            solver_testing();
+            check_help_examples();
+        }
 #if 0
         if (onlyCurrent & 2)
             demo_ui();
@@ -6608,6 +6610,22 @@ void tests::solver_testing()
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
 
+    step("Jacobian solver, linear case")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
+              "{ X Y } { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.2 Y=1.8 }");
+    step("Jacobian solver, linear case with extra true equation")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y+10=0' }"
+              "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.2 Y=1.8 }");
+    step("Jacobian solver, linear case with extra false equation")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y=10' }"
+              "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
+        .error("Unable to solve for all variables");
+    step("Jacobian solver, two circles")
+        .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
+              "{ X Y } { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.5 Y=0.86602 54037 84 }");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);

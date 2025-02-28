@@ -132,6 +132,8 @@ COMMAND_DECLARE(FromArray, 1);
 COMMAND_DECLARE(ConstantArray, 2);
 COMMAND_DECLARE(IdentityMatrix, 1);
 COMMAND_DECLARE(RandomMatrix, 1);
+COMMAND_DECLARE(Transpose, 1);
+COMMAND_DECLARE(TransConjugate, 1);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);

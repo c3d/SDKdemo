@@ -553,6 +553,8 @@ NAMED(FromArray, "Arry→")       ALIAS(FromArray, "Array→")
 NAMED(ConstantArray, "Con")
 NAMED(IdentityMatrix, "Idn")
 NAMED(RandomMatrix, "RanM")     ALIAS(RandomMatrix, "RandomArray")
+CMD(Transpose)                  ALIAS(Transpose, "Tran")
+CMD(TransConjugate)             ALIAS(TransConjugate, "Trn")
 
 // Directories
 NAMED(Path, "DirectoryPath")

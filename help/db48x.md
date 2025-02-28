@@ -12934,7 +12934,7 @@ Sum of the items in the diagonal of a matrix
 
 
 ## TRAN
-Transpose a matrix
+Transpose a matrix (without comjugate, unlike `TRN`)
 
 
 ## TRN

@@ -182,10 +182,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-        {
-            solver_testing();
-            check_help_examples();
-        }
+            matrix_functions();
 
 #if 0
         if (onlyCurrent & 2)
@@ -6447,6 +6444,13 @@ void tests::matrix_functions()
     step("Tagged array operations")
         .test(CLEAR, ":A:[1 2] :B:[3 4] +", ENTER)
         .want("[ 4 6 ]");
+
+    step("Transpose")
+        .test(CLEAR, "[[1 2 3+2ⅈ][4 5-2ⅈ 6]]", ID_ToolsMenu, ID_Transpose)
+        .want("[[ 1 4 ] [ 2 5-2ⅈ ] [ 3+2ⅈ 6 ]]");
+    step("Transpose and conjugate")
+        .test(CLEAR, "[[1 2 3+2ⅈ][4 5-2ⅈ 6]]", ID_ToolsMenu, ID_TransConjugate)
+        .want("[[ 1 4 ] [ 2 5+2ⅈ ] [ 3-2ⅈ 6 ]]");
 }
 
 

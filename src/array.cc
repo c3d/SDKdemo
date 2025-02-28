@@ -1920,6 +1920,53 @@ COMMAND_BODY(FromVector)
 }
 
 
+static object::result transpose(bool conjugate)
+// ----------------------------------------------------------------------------
+//   Transpose with or without conjugate
+// ----------------------------------------------------------------------------
+{
+    if (object_g obj = rt.top())
+    {
+        if (array_p v = obj->as<array>())
+        {
+            size_t rows = 0, columns = 0;
+            if (v->is_matrix(&rows, &columns, true))
+            {
+                if (algebraic_p res = array::from_stack(rows, columns, true))
+                {
+                    if (res && rt.top(res))
+                        return conjugate ? conj::evaluate() : object::OK;
+                }
+            }
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return object::ERROR;
+}
+
+
+COMMAND_BODY(Transpose)
+// ----------------------------------------------------------------------------
+//   Convert an array to its transposed version
+// ----------------------------------------------------------------------------
+{
+    return transpose(false);
+}
+
+
+COMMAND_BODY(TransConjugate)
+// ----------------------------------------------------------------------------
+//   Convert an array to its transposed / conjugate version
+// ----------------------------------------------------------------------------
+{
+    return transpose(true);
+}
+
+
+
 
 // ============================================================================
 //

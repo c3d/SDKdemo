@@ -80,7 +80,7 @@ struct array : list
     bool expand() const;
     static bool size_from_stack(size_t *rows, size_t *columns, uint level=0);
     static bool size_from_object(size_t *rows, size_t *columns, object_r obj);
-    static array_p from_stack(size_t rows, size_t columns);
+    static array_p from_stack(size_t rows, size_t columns, bool transp=false);
     typedef object_p (*item_fn)(size_t rows, size_t columns,
                                 size_t row, size_t column,
                                 void *data);

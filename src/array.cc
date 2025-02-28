@@ -393,12 +393,31 @@ static object_p item_from_stack(size_t rows, size_t columns,
 }
 
 
-array_p array::from_stack(size_t rows, size_t columns)
+static object_p transpose_from_stack(size_t rows, size_t columns,
+                                     size_t r, size_t c, void *)
+// ----------------------------------------------------------------------------
+//   Return an item from the stack
+// ----------------------------------------------------------------------------
+{
+    if (!rows)
+        rows = 1;
+    size_t nitems = rows * columns;
+    size_t idx = c * rows + r;
+    if (object_p obj = rt.stack(nitems + ~idx))
+        return obj;
+    return nullptr;
+}
+
+
+array_p array::from_stack(size_t rows, size_t columns, bool transpose)
 // ----------------------------------------------------------------------------
 //   Build an array from items on the stack
 // ----------------------------------------------------------------------------
 {
-    array_p result = build(rows, columns, item_from_stack);
+    array_p result = transpose
+        ? build(columns, rows, transpose_from_stack)
+        : build(rows, columns, item_from_stack);
+
     if (result)
         rt.drop(rows * (columns ? columns : 1));
     return result;

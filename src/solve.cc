@@ -212,9 +212,9 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     }
 
     save<symbol_g *> iref(expression::independent, &name);
-    int              prec = Settings.Precision() - Settings.SolverImprecision();
-    algebraic_g      yeps  = decimal::make(1, prec <= 0 ? -1 : -prec);
-    algebraic_g      xeps  = (lx + hx) * yeps;
+    int              impr        = Settings.SolverImprecision();
+    algebraic_g      yeps        = algebraic::epsilon(impr);
+    algebraic_g      xeps        = (lx + hx) * yeps;
     bool             is_constant = true;
     bool             is_valid    = false;
     uint             max         = Settings.SolverIterations();

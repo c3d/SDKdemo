@@ -182,7 +182,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
+        {
+            solver_testing();
             check_help_examples();
+        }
 
 #if 0
         if (onlyCurrent & 2)
@@ -6501,7 +6504,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-7.8⁳⁻²¹'");
+        .expect("'25=25.+2.11075 8519⁳⁻¹²'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)

@@ -925,3 +925,16 @@ algebraic_p algebraic::zero_divide(algebraic_r x)
 {
     return rt.zero_divide(x && x->is_negative(false));
 }
+
+
+algebraic_p algebraic::epsilon(int impr)
+// ----------------------------------------------------------------------------
+//   Compute an epsilon value e.g. for numerical solver or integrator
+// ----------------------------------------------------------------------------
+{
+    int         disp = Settings.DisplayDigits();
+    int         prec = Settings.Precision();
+    int         dig  = std::min(disp + 1, std::max(prec - impr, 3));
+    algebraic_p eps  = decimal::make(1, -dig);
+    return eps;
+}

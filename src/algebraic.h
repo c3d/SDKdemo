@@ -128,6 +128,8 @@ struct algebraic : command
 
     static algebraic_p zero_divide(algebraic_r x);
 
+    static algebraic_p epsilon(int imprecision = 0);
+
     INSERT_DECL(algebraic);
 };
 

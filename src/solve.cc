@@ -735,7 +735,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                         rt.type_error();
                     return nullptr;
                 }
-                bool defined = eq->is_well_defined(var, false);
+                bool defined = eq->is_well_defined(var, false, vars);
                 record(msolve, "For %t %+s %t",
                        +var, defined ? "ok" : "ko", +eq);
                 if (defined)

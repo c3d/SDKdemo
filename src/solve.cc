@@ -47,6 +47,8 @@
 #include "unit.h"
 #include "variables.h"
 
+RECORDER(msolve, 16, "Multiple-equation numerical solver");
+RECORDER(jsolve, 16, "Jacobian numerical solver");
 RECORDER(solve, 16, "Numerical solver");
 RECORDER(solve_error, 16, "Numerical solver errors");
 
@@ -632,6 +634,10 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     if (!eqs || !names || !guesses)
         return nullptr;
 
+    save<bool>  nodates(unit::nodates, true);
+    record(msolve, "Solve equations %t for names %t with guesses %t",
+           +eqs, +names, +guesses);
+
     // Check that we have names as variables
     size_t vcount = 0;
     for (object_p obj : *names)
@@ -713,6 +719,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 rt.type_error();
                 return nullptr;
             }
+            record(msolve, "Trying to solve for %t", +var);
 
             // The variable must be well-defined in exactly one equation
             list::iterator ei = eqns->begin();
@@ -728,7 +735,10 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                         rt.type_error();
                     return nullptr;
                 }
-                if (eq->is_well_defined(var, false))
+                bool defined = eq->is_well_defined(var, false);
+                record(msolve, "For %t %+s %t",
+                       +var, defined ? "ok" : "ko", +eq);
+                if (defined)
                 {
                     if (!defs++)
                     {
@@ -744,6 +754,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 program_g   pgm    = +def;
                 algebraic_p guess  = algebraic_p(*gi);
                 algebraic_g solved = solve(pgm, name, guess);
+                record(msolve, "Solved %t as %t", +pgm, +solved);
                 if (!solved)
                 {
                     solver_command_error();
@@ -767,6 +778,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
         // This algorithm does not apply, some variables were not found
         if (!found && ecount >= vcount)
         {
+            record(msolve, "Could not solve for %t in %t", +vars, +eqns);
             eqns = eqns->map(difference_for_solve);
             found = jacobi_solver(eqns, vars, gvalues);
             ecount = 0;
@@ -804,6 +816,8 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
     uint           max   = Settings.SolverIterations();
     uint           iter  = 0;
 
+    record(jsolve, "Solve for %t in %t guesses %t", +vars, +eqs, +guesses);
+
     while (iter++ < max)
     {
         // Set all variables to current value of guesses
@@ -827,10 +841,13 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
             algebraic_p value = eq->evaluate();
             if (!value || !(neqs >= n || rt.push(value)))
                 goto error;
+            while (unit_p u = value->as<unit>())
+                value = u->value();
             algebraic_g absval = abs::run(value);
             magnitude = magnitude ? magnitude + absval : absval;
             neqs++;
         }
+        record(jsolve, "Magnitude is %t", +magnitude);
 
         // Check if we already found a solution, if so exit
         if (smaller_magnitude(magnitude, eps))
@@ -885,6 +902,7 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         array_g j = array::from_stack(n, n, true);
         array_g v = array::from_stack(n, 0);
         array_g d = v / j;
+        record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
         v = array_p(+guesses);
         v = v - d;
         if (!v)

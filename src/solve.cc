@@ -827,6 +827,10 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
     algebraic_g    oeps  = decimal::make(101,-2);
     uint           max   = Settings.SolverIterations();
     uint           iter  = 0;
+    int            errs  = 0;
+    bool           back  = false; // Go backwards
+    array_g        j, v, d;
+    algebraic_g    magnitude, last, forward;
 
     record(jsolve, "Solve for %t in %t guesses %t", +vars, +eqs, +guesses);
 
@@ -843,20 +847,47 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         for (object_p varo : *vars)
         {
             object_p valo = *gi;
+            if (errs)
+            {
+                if (algebraic_g valg = valo->as_algebraic())
+                {
+                    // Shuffle slightly around current position
+                    algebraic_g pw = pow(oeps, errs) + eps;
+                    if (!pw)
+                        goto error;
+                    valo = pw;
+                }
+            }
             if (!directory::store_here(varo, valo))
                 goto error;
             ++gi;
         }
 
         // Evaluate all equations at current values of variables
-        algebraic_g magnitude;
         size_t neqs = 0;
+        magnitude = nullptr;
         for (object_p eqo : *eqs)
         {
             expression_p eq = expression::get(eqo);
             if (!eq)
                 goto error;
             algebraic_p value = eq->evaluate();
+            if (!value)
+            {
+                // Possibly a transient domain error, try shuffling around
+                if (errs++ == 0)
+                {
+                    if (last)
+                    {
+                        // Return to a known good position
+                        v = v + d;
+                        guesses = +v;
+                    }
+                }
+                // Try shuffling around the known good position a few times
+                if (errs < 5)
+                    continue;
+            }
             if (!value || !(neqs >= n || rt.push(value)))
                 goto error;
             while (unit_p u = value->as<unit>())
@@ -870,6 +901,33 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         // Check if we already found a solution, if so exit
         if (smaller_magnitude(magnitude, eps))
             break;
+
+        // Check if we are going in the wrong direction
+        if (last && smaller_magnitude(last, magnitude))
+        {
+            if (!back)
+            {
+                record(jsolve, "Worse than  %t, try backwards", +last);
+                v = v + d;
+                v = v + d;
+                guesses = +v;
+                forward = magnitude;
+                back = true;
+                continue;
+            }
+            back = false;
+            last = nullptr;
+            if (smaller_magnitude(forward, magnitude))
+            {
+                // Pick up forward direction if it was better
+                record(jsolve, "Forward worse, resume forward", +last);
+                v = v - d;
+                v = v - d;
+                guesses = +v;
+                continue;
+            }
+        }
+        last = magnitude;
 
         // Compute the Jacobi matrix by shifting each variable
         gi = guesses->begin();
@@ -917,9 +975,9 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         }
 
         // It's a bit inefficient to create arrays here, but save code space
-        array_g j = array::from_stack(n, n, true);
-        array_g v = array::from_stack(n, 0);
-        array_g d = v / j;
+        j = array::from_stack(n, n, true);
+        v = array::from_stack(n, 0);
+        d = v / j;
         record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
         v = array_p(+guesses);
         v = v - d;

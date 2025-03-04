@@ -272,8 +272,14 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
         }
     }
 
-    for (uint i = 0; i < max && !program::interrupted(); i++)
+    for (uint i = 0; i < max; i++)
     {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
         // If we failed during evaluation of x, break
         if (!x)
         {
@@ -696,8 +702,14 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     list_g eqns   = eqs;
 
     // While there are variables to solve for
-    while (vcount && ecount && !program::interrupted())
+    while (vcount && ecount)
     {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
         list::iterator vi    = vars->begin();
         list::iterator gi    = gvalues->begin();
         bool           found = false;
@@ -820,6 +832,12 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
 
     while (iter++ < max)
     {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
         // Set all variables to current value of guesses
         list::iterator gi = guesses->begin();
         for (object_p varo : *vars)

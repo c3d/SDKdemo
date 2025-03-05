@@ -10315,18 +10315,6 @@ Raise to the inverse power. `X Y xroot` is equivalent to `X Y inv pow`.
 `Y` `X` ▶ `Y↑(1/X)`
 
 
-# Integer arithmetic and polynomials
-
-This section documents newRPL commands that are not implemented yet in DB48X.
-
-## SETPREC
-Set the current system precision
-
-
-## GETPREC
-Get the current system precision
-
-
 ## Floor
 
 Largest integer less than the input
@@ -10345,6 +10333,24 @@ Integer part of a number
 ## FractionalPart
 
 Fractional part of a number
+
+
+## Abs
+
+Return the absolute value for a real numner.
+Return the Euclidean norm for a complex number, vector or matrix.
+
+
+# Integer arithmetic and polynomials
+
+This section documents newRPL commands that are not implemented yet in DB48X.
+
+## SETPREC
+Set the current system precision
+
+
+## GETPREC
+Get the current system precision
 
 
 ## MODSTO
@@ -10895,29 +10901,50 @@ Check if the first value is greater than or equal to the second value.
 ```
 # Operations with Complex Numbers
 
-## RE
+## Re
 Real part of a complex number
 
-
-## IM
+## Im
 Imaginary part of a complex number
 
-
-## ARG
+## Arg
 Argument of a complex number
 
-
-## CONJ
+## Conj
 Conjugate of a complex number
 
+## RectangularToReal
+Extract real and imaginary parts from a complex number in rectangular form
 
-## CPLX2REAL
-Split Complex into two Reals
+## RealToRectangular
+Make a complex number in rectangular form from real and imaginary part
 
+## PolarToReal
+Extract modulus and argument from a complex number in polar form
 
-## REAL2CPLX
-Make Complex from real and imaginary parts
+## RealToPolar
+Make a complex number in polar form from argument and modulus
 
+## ToRectangular
+Convert a complex number to rectangular form
+
+## ToPolar
+Convert a complex number or a 2D or 3D vector to polar form
+
+## ToCylindrical
+Convert a 3D vector to cylindrical form
+
+## ToSpherical
+Convert a 3D vector to spherical form
+
+## To2DVector
+Make a 2D vector from two components
+
+## To3DVector
+Make a 3D vector from three components
+
+## FromVector
+Expand a vector into its individual components
 # Lists, Matrix and String commands
 
 ## PUT
@@ -12755,11 +12782,11 @@ the constant, depending on the object in argument 1/level 2.
 
 
 
-## COND
+## Cond
 Column norm condition number of a matrix
 
 
-## CROSS
+## Cross
 Cross produce of vectors
 
 

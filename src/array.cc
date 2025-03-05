@@ -30,6 +30,7 @@
 #include "array.h"
 
 #include "arithmetic.h"
+#include "compare.h"
 #include "expression.h"
 #include "functions.h"
 #include "grob.h"
@@ -1368,6 +1369,110 @@ COMMAND_BODY(cross)
         }
     }
     return ERROR;
+}
+
+
+algebraic_p array::one_norm(array_p ao, bool column)
+// ----------------------------------------------------------------------------
+//   Compute a row or column 1-norm
+// ----------------------------------------------------------------------------
+{
+    size_t  cx, rx;
+    array_g a = ao;
+    algebraic_g norm, item, sum;
+    if (a->is_matrix(&cx, &rx))
+    {
+        size_t nitems = cx * rx;
+        if (column)
+        {
+            for (size_t c = 0; c < cx; c++)
+            {
+                for (size_t r = 0; r < rx; r++)
+                {
+                    size_t i = r * cx + c;
+                    item = rt.stack(nitems + ~i)->as_algebraic();
+                    item = abs::evaluate(item);
+                    sum = sum ? sum + item : item;
+                }
+                if (!norm || compare(norm, sum) < 0)
+                    norm = sum;
+                sum = nullptr;
+            }
+        }
+        else
+        {
+            for (size_t r = 0; r < rx; r++)
+            {
+                for (size_t c = 0; c < cx; c++)
+                {
+                    size_t i = r * cx + c;
+                    item = rt.stack(nitems + ~i)->as_algebraic();
+                    item = abs::evaluate(item);
+                    sum = sum ? sum + item : item;
+                }
+                if (!norm || compare(norm, sum) < 0)
+                    norm = sum;
+                sum = nullptr;
+            }
+        }
+        rt.drop(rx * cx);
+        return norm;
+    }
+    else if (a->is_vector(&rx))
+    {
+        // For vectors, sum of the absolute values of vector elements
+        for (size_t i = 0; i < rx; i++)
+        {
+            item = rt.stack(i)->as_algebraic();
+            item = abs::evaluate(item);
+            if (column)
+                norm = norm ? norm + item : item;
+            else if (!norm || compare(norm, item) < 0)
+                norm = item;
+        }
+        rt.drop(rx);
+        return norm;
+    }
+
+    rt.type_error();
+    return nullptr;
+}
+
+
+object::result array::one_norm(bool column)
+// ----------------------------------------------------------------------------
+//   Compute a 1-norm (row or column)
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    if (array_p a = obj->as<array>())
+    {
+        if (algebraic_p norm = one_norm(a, column))
+            if (rt.top(norm))
+                return OK;
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(ColumnNorm)
+// ----------------------------------------------------------------------------
+//   Compute the column norm
+// ----------------------------------------------------------------------------
+{
+    return array::one_norm(true);}
+
+
+COMMAND_BODY(RowNorm)
+// ----------------------------------------------------------------------------
+//   Implement a cross product
+// ----------------------------------------------------------------------------
+{
+    return array::one_norm(false);
 }
 
 

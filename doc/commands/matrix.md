@@ -86,7 +86,7 @@ Find vectors forming a basis of the subspace represented by the matrix
 Perform Cholesky decomposition on a matrix
 
 
-## CNRM
+## ColumnNorm
 Column norm (one norm) of a matrix
 
 
@@ -126,11 +126,11 @@ the constant, depending on the object in argument 1/level 2.
 
 
 
-## COND
+## Cond
 Column norm condition number of a matrix
 
 
-## CROSS
+## Cross
 Cross produce of vectors
 
 

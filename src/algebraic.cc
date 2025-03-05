@@ -32,6 +32,7 @@
 #include "arithmetic.h"
 #include "array.h"
 #include "bignum.h"
+#include "compare.h"
 #include "complex.h"
 #include "constants.h"
 #include "decimal.h"
@@ -937,4 +938,16 @@ algebraic_p algebraic::epsilon(int impr)
     int         dig  = std::min(disp + 1, std::max(prec - impr, 3));
     algebraic_p eps  = decimal::make(1, -dig);
     return eps;
+}
+
+
+int algebraic::compare(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   Return a comparison number beteen two valeus
+// ----------------------------------------------------------------------------
+{
+    int result;
+    if (x && y && comparison::compare(&result, x, y))
+        return result;
+    return 777;
 }

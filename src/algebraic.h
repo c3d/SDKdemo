@@ -130,6 +130,8 @@ struct algebraic : command
 
     static algebraic_p epsilon(int imprecision = 0);
 
+    static int compare(algebraic_r x, algebraic_r y);
+
     INSERT_DECL(algebraic);
 };
 

@@ -108,6 +108,8 @@ struct array : list
     static array_p      mul(array_r x, array_r y);
     static algebraic_p  dot(array_r x, array_r y);
     static array_p      cross(array_r x, array_r y);
+    static algebraic_p  one_norm(array_p x, bool column);
+    static result       one_norm(bool column);
 
 public:
     OBJECT_DECL(array);
@@ -134,6 +136,8 @@ COMMAND_DECLARE(IdentityMatrix, 1);
 COMMAND_DECLARE(RandomMatrix, 1);
 COMMAND_DECLARE(Transpose, 1);
 COMMAND_DECLARE(TransConjugate, 1);
+COMMAND_DECLARE(ColumnNorm, 1);
+COMMAND_DECLARE(RowNorm, 1);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);

@@ -12715,7 +12715,7 @@ Find vectors forming a basis of the subspace represented by the matrix
 Perform Cholesky decomposition on a matrix
 
 
-## CNRM
+## ColumnNorm
 Column norm (one norm) of a matrix
 
 

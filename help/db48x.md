@@ -11094,8 +11094,8 @@ display mode and manipulation:
 * `Round` is a command (from HP50g) that rounds its input in the same way
   `Trunc` truncates it.
 
-If the uncertainty `UsX` and `UrX` result from a calculation, *Rule1* is easily
-implemented by `UsX=ROUND(UsX,-2)` and `UrX=ROUND(UrX,-2)`.
+If the uncertainty `UsX` and `UrX` result from a calculation, [Rule 1](#rule-1)
+is easily implemented by `UsX=ROUND(UsX,-2)` and `UrX=ROUND(UrX,-2)`.
 
 The following five commands are added as extensions of DB48x to support the
 remaining 4 rules: `→Us`, `→Ur`, `StandardRound`, `RelativeRound` and
@@ -11107,7 +11107,8 @@ remaining 4 rules: `→Us`, `→Ur`, `StandardRound`, `RelativeRound` and
 Calculate standard uncertainty.
 
 This command calculates a standard uncertainty `UsX` given the relative
-uncertainty `UrX` and the central value `X`. This implements *Rule2* for `UsX`.
+uncertainty `UrX` and the central value `X`. This implements [Rule 2](#rule-2)
+for `UsX`.
 
 ```rpl
 -3.141592654_m  0.000012  →Us
@@ -11119,7 +11120,8 @@ uncertainty `UrX` and the central value `X`. This implements *Rule2* for `UsX`.
 Calculate relative uncertainty.
 
 This command calculates a relative uncertainty `UrX` given the standard
-uncertainty `UsX` and the central value `X`. This implements *Rule2* for `UrX`.
+uncertainty `UsX` and the central value `X`. This implements [Rule 2](#rule-2)
+for `UrX`.
 
 
 ```rpl
@@ -11129,7 +11131,7 @@ uncertainty `UsX` and the central value `X`. This implements *Rule2* for `UrX`.
 
 ## StandardRound
 
-Round a value based on a standard uncertainty, implementing *Rule3*.
+Round a value based on a standard uncertainty, implementing [Rule 3](#rule-3).
 
 ```rpl
 -3.141592654_m  0.000045_m  StdRnd
@@ -11146,7 +11148,8 @@ To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
 
 ## RelativeRound
 
-Round a value based on a relative uncertainty, implementing *Rule2* and *Rule3*.
+Round a value based on a relative uncertainty, implementing [Rule 2](#rule-2)
+and [Rule 3](#rule-3).
 
 ```rpl
 -3.141592654_m  0.000012  RelRnd
@@ -11175,9 +11178,9 @@ To calculate `Urε₀=Ⓡε₀` and then the correct rounding of
 
 Round one value to the precision of another one.
 
-This implements *Rule4* and *Rule5*. The user has to judge carefully to
-establish the respective role of `X` and `Y`. There is no automatic use here,
-since it depends on the precise nature of the calculation.
+This implements [Rule 4](#rule-4) and [Rule 5](#rule-5). The user has to judge
+carefully to establish the respective role of `X` and `Y`. There is no automatic
+use here, since it depends on the precise nature of the calculation.
 
 
 ```rpl

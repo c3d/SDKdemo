@@ -496,6 +496,7 @@ algebraic_p array::determinant() const
 {
     size_t cx, rx;
     size_t depth = rt.depth();
+    algebraic_g det = this;
     if (is_matrix(&rx, &cx))
     {
         if (rx != cx)
@@ -508,13 +509,13 @@ algebraic_p array::determinant() const
         size_t      pt  = n;    // n temporary elements to save diagonal
         size_t      px  = n * n + n;
         bool        neg = false;
-        algebraic_g det;
         algebraic_g tot;
 
         // Make space for temporary elements
         for (size_t j = 0; j < n; j++)
-            if (!rt.push(this))
+            if (!rt.push(+det))
                 goto err;
+        det = nullptr;
 
 #if SIMULATOR
         record(matrix, "Determinant of %ux%u matrix", n, n);

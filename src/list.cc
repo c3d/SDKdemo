@@ -114,7 +114,7 @@ object::result list::list_parse(id      type,
         cp = utf8_codepoint(s);
         if (cp == close)
         {
-            s = utf8_next(s);
+            s = +p.source + utf8_next(+p.source, s - +p.source, max);
             break;
         }
         if (precedence && (cp == '\'' || cp == ')' ||
